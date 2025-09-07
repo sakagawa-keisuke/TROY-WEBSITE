@@ -1,0 +1,282 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Kuroki Ryota (TROY) — Portfolio</title>
+    <meta name="description" content="Film Director Kuroki Ryota (TROY) のポートフォリオ。プロフィール、ワークス、インフォメーション。" />
+    <meta name="theme-color" content="#0b0b0b" />
+    <meta property="og:title" content="Kuroki Ryota (TROY) — Portfolio" />
+    <meta property="og:description" content="Film Director Kuroki Ryota (TROY) のポートフォリオ。プロフィール、ワークス、インフォメーション。" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="" />
+    <meta property="og:image" content="assets/og-image.png" />
+    <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
+    <link rel="manifest" href="manifest.webmanifest" />
+    <link rel="stylesheet" href="assets/style.css" />
+  </head>
+  <body data-page="home">
+    <a class="skip" href="#works">Skip to content</a>
+
+    <header class="site-header" role="banner">
+      <div class="brand">
+        <a href="#works" class="logo" aria-label="Kuroki Ryota (TROY)">TROY</a>
+        <span class="role">Film Director</span>
+      </div>
+      <nav class="site-nav" aria-label="Primary">
+        <button class="nav-toggle" aria-expanded="false" aria-controls="menu">MENU</button>
+        <ul id="menu">
+          <li><a href="profile.html">Profile</a></li>
+          <li><a href="index.html">Works</a></li>
+          <li><a href="info.html">Information</a></li>
+          <li class="ext">
+            <a class="icon" href="https://www.instagram.com/troy_loss/#" target="_blank" rel="noopener" aria-label="Instagram">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 2h10a5 5 0 0 1 5 5v10a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5zm0 2a3 3 0 0 0-3 3v10a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3V7a3 3 0 0 0-3-3H7zm5 3.5A5.5 5.5 0 1 1 6.5 13 5.5 5.5 0 0 1 12 7.5zm0 2A3.5 3.5 0 1 0 15.5 13 3.5 3.5 0 0 0 12 9.5zM18 6.2a1 1 0 1 1-1-1 1 1 0 0 1 1 1z"/></svg>
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </header>
+
+    <main id="content" class="site-main" role="main">
+      <!-- Profile (hidden by default; shown via nav) -->
+      <section id="profile" class="section section-profile" aria-labelledby="profile-title" hidden>
+        <div class="section-header">
+          <h1 id="profile-title">Kuroki Ryota <span class="aka">(TROY)</span></h1>
+          <p class="tag">Film Director / 東京</p>
+        </div>
+        <div class="section-body">
+          <p>
+            映像監督。モード、ストリート、カルチャーを横断し、音楽／ファッションの文脈でエッジのある映像表現を探求。
+            ミュージックビデオ、キャンペーン、ショートフィルム、インスタレーションまで幅広くディレクションを行う。
+          </p>
+          <ul class="credits">
+            <li>領域: MV / Brand Film / Campaign / Experimental</li>
+            <li>拠点: 東京（国内外出張可）</li>
+            <li>別名義: TROY</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- Information (hidden by default; shown via nav) -->
+      <section id="info" class="section section-info" aria-labelledby="info-title" hidden>
+        <div class="section-header">
+          <h2 id="info-title">Information</h2>
+        </div>
+        <div class="section-body info-cols">
+          <div>
+            <h3>Contact</h3>
+            <ul class="list">
+              <li>Mail: <a href="mailto:hello@example.com">hello@example.com</a>（差替えください）</li>
+              <li>Instagram: <a href="https://www.instagram.com/troy_loss/#" target="_blank" rel="noopener">@troy_loss</a></li>
+            </ul>
+          </div>
+          <div>
+            <h3>Availability</h3>
+            <ul class="list">
+              <li>企画・脚本・編集まで一貫対応可</li>
+              <li>日英コミュニケーション（要調整）</li>
+              <li>国内外ロケーション手配（要相談）</li>
+            </ul>
+          </div>
+          <div>
+            <h3>Press / Awards</h3>
+            <ul class="list">
+              <li>掲載・受賞歴はここに追記</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section id="works" class="section section-works" aria-labelledby="works-title">
+        <div class="section-header">
+          <h2 id="works-title">Works</h2>
+          <div class="filters" role="toolbar" aria-label="Filter categories">
+            <button class="filter-btn active" data-filter="all" aria-pressed="true">All</button>
+            <button class="filter-btn" data-filter="feature-films" aria-pressed="false">Feature Films</button>
+            <button class="filter-btn" data-filter="music-videos" aria-pressed="false">Music Videos</button>
+            <button class="filter-btn" data-filter="short-films" aria-pressed="false">Short Films</button>
+            <button class="filter-btn" data-filter="documentaries" aria-pressed="false">Documentaries</button>
+            <button class="filter-btn" data-filter="commercial" aria-pressed="false">Commercial</button>
+          </div>
+        </div>
+
+        <!-- Random autoplay hero (top of Works) -->
+        <div class="hero" id="hero" aria-label="Featured work">
+          <div class="hero-media">
+            <video id="hero-video" class="hero-video" muted playsinline autoplay loop preload="metadata"></video>
+            <div class="hero-overlay">
+              <div class="hero-title" id="hero-title"></div>
+              <div class="hero-meta" id="hero-meta"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="works-grid">
+          <!-- Sample assets wired from サンプル素材 -->
+
+          <!-- 1) Benson Boone — has matching poster -->
+          <figure class="work" data-kind="video" data-slug="beautiful-things" data-title="Beautiful Things — Japanese MV" data-meta="Dir. TROY" data-cats="music-videos" data-video-src="サンプル素材/Direction for @bensonboone 「Beautiful Things」 Japanese Official Music VideoCast- Nanami - Nobuna.mp4" data-poster="サンプル素材/Direction for @bensonboone 「Beautiful Things」 Japanese Official Music VideoCast- Nanami - Nobuna.jpg" tabindex="0">
+            <div class="media-frame">
+              <video class="work-video" muted playsinline loop preload="metadata" poster="サンプル素材/Direction for @bensonboone 「Beautiful Things」 Japanese Official Music VideoCast- Nanami - Nobuna.jpg" data-src="サンプル素材/Direction for @bensonboone 「Beautiful Things」 Japanese Official Music VideoCast- Nanami - Nobuna.mp4" aria-label="Direction for @bensonboone 「Beautiful Things」"></video>
+              <div class="overlay">
+                <div class="ovl-title">Beautiful Things — Japanese MV</div>
+                <div class="ovl-meta">Dir. TROY</div>
+              </div>
+            </div>
+          </figure>
+
+          <!-- 2) keen_japan -->
+          <figure class="work" data-kind="video" data-slug="keen-japan" data-title="Direction for @keen_japan" data-meta="Dir. TROY" data-cats="commercial" data-video-src="サンプル素材/Direction for @keen_japan Cinematographer- @gaku_0701 1stAC- @kota4074 Camera Assistant - @cooki.mp4" tabindex="0">
+            <div class="media-frame">
+              <video class="work-video" muted playsinline loop preload="metadata" data-src="サンプル素材/Direction for @keen_japan Cinematographer- @gaku_0701 1stAC- @kota4074 Camera Assistant - @cooki.mp4" aria-label="Direction for @keen_japan"></video>
+              <div class="overlay">
+                <div class="ovl-title">Direction for @keen_japan</div>
+                <div class="ovl-meta">Dir. TROY</div>
+              </div>
+            </div>
+          </figure>
+
+          <!-- 3) PUMA (1) -->
+          <figure class="work" data-kind="video" data-slug="puma-geek-1" data-title="PUMA — GEEK (cut 1)" data-meta="Dir. TROY" data-cats="commercial" data-video-src="サンプル素材/direction for @pumajapan 20人のGEEKを切り取りました🐅starring- @junki_tozuka @moekappa823 director- @troy_ (1).mp4" tabindex="0">
+            <div class="media-frame">
+              <video class="work-video" muted playsinline loop preload="metadata" data-src="サンプル素材/direction for @pumajapan 20人のGEEKを切り取りました🐅starring- @junki_tozuka @moekappa823 director- @troy_ (1).mp4" aria-label="direction for @pumajapan GEEK (1)"></video>
+              <div class="overlay">
+                <div class="ovl-title">PUMA — GEEK (cut 1)</div>
+                <div class="ovl-meta">Dir. TROY</div>
+              </div>
+            </div>
+          </figure>
+
+          <!-- 4) PUMA -->
+          <figure class="work" data-kind="video" data-slug="puma-geek" data-title="PUMA — GEEK" data-meta="Dir. TROY" data-cats="commercial" data-video-src="サンプル素材/direction for @pumajapan 20人のGEEKを切り取りました🐅starring- @junki_tozuka @moekappa823 director- @troy_.mp4" tabindex="0">
+            <div class="media-frame">
+              <video class="work-video" muted playsinline loop preload="metadata" data-src="サンプル素材/direction for @pumajapan 20人のGEEKを切り取りました🐅starring- @junki_tozuka @moekappa823 director- @troy_.mp4" aria-label="direction for @pumajapan GEEK"></video>
+              <div class="overlay">
+                <div class="ovl-title">PUMA — GEEK</div>
+                <div class="ovl-meta">Dir. TROY</div>
+              </div>
+            </div>
+          </figure>
+
+          <!-- 5) Vans Japan -->
+          <figure class="work" data-kind="video" data-slug="vans-friends-i-love" data-title="VANS JAPAN — friends i love" data-meta="Dir. TROY" data-cats="commercial" data-video-src="サンプル素材/direction for @vansjapan friends i love🐎💫☄️ @tx3ktx3k.mp4" tabindex="0">
+            <div class="media-frame">
+              <video class="work-video" muted playsinline loop preload="metadata" data-src="サンプル素材/direction for @vansjapan friends i love🐎💫☄️ @tx3ktx3k.mp4" aria-label="direction for @vansjapan"></video>
+              <div class="overlay">
+                <div class="ovl-title">VANS JAPAN — friends i love</div>
+                <div class="ovl-meta">Dir. TROY</div>
+              </div>
+            </div>
+          </figure>
+
+          <!-- 6) niko and ... / WILLIAM B. ELIOTT -->
+          <figure class="work" data-kind="video" data-slug="wbe-nikoand" data-title="WILLIAM B. ELIOTT — niko and ..." data-meta="Dir. TROY" data-cats="commercial" data-video-src="サンプル素材/direction for WILLIAM B. ELIOTT @nikoand_official brand director - @_yujiyoshida_ - taka waidafi.mp4" tabindex="0">
+            <div class="media-frame">
+              <video class="work-video" muted playsinline loop preload="metadata" data-src="サンプル素材/direction for WILLIAM B. ELIOTT @nikoand_official brand director - @_yujiyoshida_ - taka waidafi.mp4" aria-label="WILLIAM B. ELIOTT / niko and ..."></video>
+              <div class="overlay">
+                <div class="ovl-title">WILLIAM B. ELIOTT — niko and ...</div>
+                <div class="ovl-meta">Dir. TROY</div>
+              </div>
+            </div>
+          </figure>
+
+          <!-- 7) ベッド -->
+          <figure class="work" data-kind="video" data-slug="bed" data-title="ベッド" data-meta="Dir. TROY" data-cats="short-films" data-video-src="サンプル素材/ベッド.mp4" tabindex="0">
+            <div class="media-frame">
+              <video class="work-video" muted playsinline loop preload="metadata" data-src="サンプル素材/ベッド.mp4" aria-label="ベッド"></video>
+              <div class="overlay">
+                <div class="ovl-title">ベッド</div>
+                <div class="ovl-meta">Dir. TROY</div>
+              </div>
+            </div>
+          </figure>
+
+          <!-- 8) 独立のご報告 -->
+          <figure class="work" data-kind="video" data-slug="independence" data-title="独立のご報告" data-meta="Dir. TROY" data-cats="short-films" data-video-src="サンプル素材/【独立のご報告】2025.09.01をもちまして前制作会社を退社しフリーランスとして制作活動していきます。今後とも変わらず愛のある圧倒的な作品を目指します。よろしくお願い致.mp4" tabindex="0">
+            <div class="media-frame">
+              <video class="work-video" muted playsinline loop preload="metadata" data-src="サンプル素材/【独立のご報告】2025.09.01をもちまして前制作会社を退社しフリーランスとして制作活動していきます。今後とも変わらず愛のある圧倒的な作品を目指します。よろしくお願い致.mp4" aria-label="独立のご報告"></video>
+              <div class="overlay">
+                <div class="ovl-title">独立のご報告</div>
+                <div class="ovl-meta">Dir. TROY</div>
+              </div>
+            </div>
+          </figure>
+
+          <!-- 9) AI 語り映像 -->
+          <figure class="work" data-kind="video" data-slug="ai-narration" data-title="AI 語り映像" data-meta="Dir. TROY" data-cats="short-films" data-video-src="サンプル素材/撮って繋いだ映像をAIに読み込ませて状況を語らせた。間違った読み上げも所々あったが修正せずにそのまま使った。この映像は現時点でのAIの身体測定。これからどんどんAIは大.mp4" tabindex="0">
+            <div class="media-frame">
+              <video class="work-video" muted playsinline loop preload="metadata" data-src="サンプル素材/撮って繋いだ映像をAIに読み込ませて状況を語らせた。間違った読み上げも所々あったが修正せずにそのまま使った。この映像は現時点でのAIの身体測定。これからどんどんAIは大.mp4" aria-label="AI 語り映像"></video>
+              <div class="overlay">
+                <div class="ovl-title">AI 語り映像</div>
+                <div class="ovl-meta">Dir. TROY</div>
+              </div>
+            </div>
+          </figure>
+
+          <!-- Still sample retained -->
+          <figure class="work" data-kind="image" data-slug="editorial-still" data-title="Editorial Still" data-meta="2022 / Dir." data-cats="editorial" data-image="assets/placeholders/still-01.svg" tabindex="0">
+            <div class="media-frame">
+              <img class="work-image" src="assets/placeholders/still-01.svg" alt="Editorial Still"/>
+              <div class="overlay">
+                <div class="ovl-title">Editorial Still</div>
+                <div class="ovl-meta">2022 / Dir.</div>
+              </div>
+            </div>
+          </figure>
+
+        </div>
+      </section>
+
+    </main>
+
+    <footer class="site-footer" role="contentinfo">
+      <small>© <span id="year"></span> Kuroki Ryota (TROY)</small>
+    </footer>
+
+    <!-- Lightbox Modal -->
+    <div id="lightbox" class="lightbox" aria-hidden="true" hidden>
+      <button class="close" aria-label="Close">×</button>
+      <div class="inner" role="dialog" aria-modal="true" aria-label="Work viewer">
+        <div class="media" id="lightbox-media"></div>
+        <div class="caption" id="lightbox-caption"></div>
+      </div>
+    </div>
+
+    <!-- Project Detail View -->
+    <div id="project" class="project" aria-hidden="true" hidden>
+      <button class="project-close" aria-label="Close">×</button>
+      <article class="project-inner" role="dialog" aria-modal="true" aria-label="Project detail">
+        <header class="project-header">
+          <h1 id="project-title"></h1>
+          <p id="project-meta" class="project-meta"></p>
+        </header>
+        <section class="project-media" id="project-media"></section>
+        <section class="project-body">
+          <div class="project-columns">
+            <div class="project-desc" id="project-desc"></div>
+            <aside class="project-credits">
+              <ul id="project-credits" class="list"></ul>
+              <div id="project-links" class="project-links"></div>
+            </aside>
+          </div>
+        </section>
+      </article>
+    </div>
+
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Person",
+      "name": "Kuroki Ryota",
+      "alternateName": "TROY",
+      "jobTitle": "Film Director",
+      "url": "/",
+      "sameAs": [
+        "https://www.instagram.com/troy_loss/"
+      ]
+    }
+    </script>
+    <script type="module" src="assets/main.js"></script>
+  </body>
+  </html>

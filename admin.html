@@ -1,0 +1,781 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Admin — TROY</title>
+    <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="assets/style.css" />
+    <style>
+      body { max-width: 960px; margin: 0 auto; }
+      form { border: 1px solid var(--line); padding: 16px; margin: 16px 0; }
+      input, select, textarea { width: 100%; padding: 8px; margin: 6px 0 12px; background:#111; color:#fff; border:1px solid var(--line); }
+      .row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+      .works-list { margin-top: 16px; }
+      .works-list li { display:grid; grid-template-columns: auto 1fr auto; align-items:center; gap:12px; border-bottom:1px solid var(--line); padding:8px 0; }
+      .btn { padding:8px 12px; border:1px solid var(--line); background:#161616; color:#fff; cursor:pointer; }
+      .tab { background:#111; }
+      .tab.active { background:#1e1e1e; border-color:#888; }
+    </style>
+  </head>
+  <body>
+    <h1>Admin</h1>
+    
+    
+    
+    <section id="auth">
+      <form id="login-form">
+        <input type="text" id="username" value="admin" autocomplete="username" style="position: absolute; left: -9999px; opacity: 0;" />
+        <label>Admin Password</label>
+        <input type="password" id="password" autocomplete="current-password" placeholder="your-secure-password" />
+        <button class="btn" type="button" id="login-btn">Login</button>
+        <p id="login-error" style="color: var(--accent); margin-top: 8px;"></p>
+      </form>
+      <button id="logout" class="btn" style="display:none;">Logout</button>
+    </section>
+
+    <section id="uploader" style="display:none;">
+      <div class="row" style="grid-template-columns:auto auto auto 1fr; align-items:center; margin-bottom:8px;">
+        <div style="display:flex; gap:8px;">
+          <button id="tab-upload" class="btn tab active" type="button">Upload</button>
+          <button id="tab-work" class="btn tab" type="button">New / Update Work</button>
+          <button id="tab-site" class="btn tab" type="button">Site (Profile / Information)</button>
+        </div>
+      </div>
+
+      <div id="panel-upload">
+        <h2>Upload File</h2>
+        <form id="upload-form">
+          <input type="file" id="file" />
+          <button class="btn" type="submit">Upload</button>
+          <p id="upload-result"></p>
+          <div id="upload-status" style="color:#aaa; font-size:12px;"></div>
+          <progress id="upload-progress" max="100" value="0" style="width:100%; height:10px; display:none;"></progress>
+        </form>
+      </div>
+
+      <div id="panel-work" style="display:none;">
+        <h2>New / Update Work</h2>
+        <form id="work-form">
+        <div class="row">
+          <div>
+            <label>Slug</label>
+            <input id="slug" placeholder="unique-slug" required />
+          </div>
+          <div>
+            <label>Category</label>
+            <select id="cats">
+              <option value="feature-films">Feature Films</option>
+              <option value="music-videos">Music Videos</option>
+              <option value="short-films">Short Films</option>
+              <option value="documentaries">Documentaries</option>
+              <option value="commercials">Commercials</option>
+            </select>
+          </div>
+        </div>
+        <div class="row">
+          <div>
+            <label>Published</label>
+            <select id="published">
+              <option value="false" selected>Private (default)</option>
+              <option value="true">Public</option>
+            </select>
+          </div>
+          <div>
+            <label>Publish at (optional)</label>
+            <input id="scheduledAt" type="datetime-local" />
+          </div>
+          <div>
+            <label>Pin as Hero</label>
+            <select id="pinHero"><option value="false" selected>No</option><option value="true">Yes</option></select>
+          </div>
+        </div>
+        <label>Title</label>
+        <input id="title" />
+        <label>Meta</label>
+        <input id="meta" placeholder="Dir. TROY" />
+        <div class="row">
+          <div>
+            <label>Client Name</label>
+            <input id="clientName" placeholder="Client Company" />
+          </div>
+          <div>
+            <label>Project Type</label>
+            <select id="projectType">
+              <option value="">Select type...</option>
+              <option value="Music Video">Music Video</option>
+              <option value="Brand Campaign">Brand Campaign</option>
+              <option value="Social Media Campaign">Social Media Campaign</option>
+              <option value="Brand Content">Brand Content</option>
+              <option value="Short Film">Short Film</option>
+              <option value="Experimental Short Film">Experimental Short Film</option>
+              <option value="Announcement Video">Announcement Video</option>
+              <option value="Documentary">Documentary</option>
+              <option value="Commercial">Commercial</option>
+              <option value="Feature Film">Feature Film</option>
+              <option value="custom">+ Add New Type</option>
+            </select>
+            <input id="customProjectType" placeholder="Enter new project type" style="display:none; margin-top: 6px;" />
+          </div>
+        </div>
+        <div class="row">
+          <div>
+            <label>Date</label>
+            <input id="date" type="date" />
+          </div>
+          <div>
+            <label>Role</label>
+            <input id="role" placeholder="Director" />
+          </div>
+        </div>
+        <label>Kind</label>
+        <select id="kind"><option value="video">video</option><option value="image">image</option></select>
+        <label>Video Src</label>
+        <input id="videoSrc" placeholder="/movies/xxx.mp4" />
+        <label>Poster</label>
+        <input id="poster" placeholder="/movies/xxx.jpg" />
+        <div class="row">
+          <div>
+            <label>Poster start (sec)</label>
+            <input type="number" id="posterSec" value="0" min="0" step="0.1" />
+          </div>
+          <div>
+            <label>&nbsp;</label>
+            <button class="btn" type="button" id="gen-poster">Generate Poster</button>
+          </div>
+        </div>
+        <label>Image Src</label>
+        <input id="imageSrc" placeholder="/movies/xxx.jpg" />
+        <label>External Link</label>
+        <input id="link" placeholder="https://..." />
+        <label>Description</label>
+        <textarea id="desc" rows="4"></textarea>
+        <div style="margin-top: 16px;">
+          <button class="btn" type="submit" id="save-work-btn">Save Work</button>
+          <button class="btn" type="button" id="clear-form-btn" style="margin-left: 8px; background: #333;">Clear Form</button>
+          <span id="edit-mode-indicator" style="margin-left: 16px; color: orange; display: none;">✎ Editing mode</span>
+        </div>
+      </form>
+      </div>
+
+      <div id="panel-site" style="display:none;">
+        <h2>Site Content</h2>
+        <form id="site-form">
+          <h3>Profile</h3>
+          <label>Title</label>
+          <input id="site-profile-title" placeholder="Kuroki Ryota (TROY)" />
+          <label>Tagline</label>
+          <input id="site-profile-tag" placeholder="Film Director / 東京" />
+          <label>Intro</label>
+          <textarea id="site-profile-intro" rows="2"></textarea>
+          <label>Detail</label>
+          <textarea id="site-profile-detail" rows="3"></textarea>
+          <label>Credits (one per line)</label>
+          <textarea id="site-profile-credits" rows="3"></textarea>
+
+          <h3>Information</h3>
+          <label>Email</label>
+          <input id="site-info-email" placeholder="hello@example.com" />
+          <label>Instagram URL</label>
+          <input id="site-info-insta-url" placeholder="https://www.instagram.com/troy_loss/" />
+          <label>Instagram Handle</label>
+          <input id="site-info-insta-handle" placeholder="@troy_loss" />
+          <label>Availability (one per line)</label>
+          <textarea id="site-info-availability" rows="3"></textarea>
+          <label>Press (one per line)</label>
+          <textarea id="site-info-press" rows="3"></textarea>
+
+          <div style="margin-top:12px;">
+            <button class="btn" type="submit">Save Site</button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <section id="works-section" style="display:none;">
+      <h2>Works</h2>
+      <div id="bulk-bar" class="row" style="grid-template-columns: 1fr 1fr; gap:8px; align-items:end;">
+        <div>
+          <button id="bulk-publish" class="btn" type="button">Publish selected</button>
+          <button id="bulk-unpublish" class="btn" type="button" style="margin-left:8px;">Unpublish selected</button>
+        </div>
+        <div>
+          <label>Schedule selected</label>
+          <input id="bulk-schedule-at" type="datetime-local" />
+          <button id="bulk-schedule" class="btn" type="button" style="margin-left:8px;">Schedule</button>
+          <button id="import-movies" class="btn" type="button" style="margin-left:8px;">Import from movies</button>
+        </div>
+      </div>
+      <ul id="works" class="works-list"></ul>
+    </section>
+
+    <script>
+      console.log('=== ADMIN SCRIPT STARTING ===');
+      
+      // Simple API helper
+      async function japi(path, opts = {}) {
+        const res = await fetch(path, {
+          credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+          ...opts
+        });
+        const text = await res.text();
+        if (!res.ok) {
+          try {
+            const j = JSON.parse(text);
+            throw new Error(j.error || text);
+          } catch {
+            throw new Error(text || ('HTTP ' + res.status));
+          }
+        }
+        try {
+          return JSON.parse(text);
+        } catch {
+          return {};
+        }
+      }
+
+      // Global error handlers
+      window.addEventListener('error', (e) => {
+        console.error('JavaScript Error:', e.error);
+        alert('JavaScript Error: ' + (e.error?.message || 'Unknown error'));
+      });
+
+      window.addEventListener('unhandledrejection', (e) => {
+        console.error('Unhandled Promise Rejection:', e.reason);
+        alert('Promise Error: ' + (e.reason?.message || 'Unknown promise error'));
+      });
+
+      // DOM elements
+      const loginForm = document.getElementById('login-form');
+      const loginBtn = document.getElementById('login-btn');
+      const passwordField = document.getElementById('password');
+      const loginErr = document.getElementById('login-error');
+      const uploader = document.getElementById('uploader');
+      const auth = document.getElementById('auth');
+      const logout = document.getElementById('logout');
+      const worksSection = document.getElementById('works-section');
+      const panelUpload = document.getElementById('panel-upload');
+      const panelWork = document.getElementById('panel-work');
+      const panelSite = document.getElementById('panel-site');
+      const tabUpload = document.getElementById('tab-upload');
+      const tabWork = document.getElementById('tab-work');
+      const tabSite = document.getElementById('tab-site');
+
+      function showPanel(which) {
+        const U = which === 'upload';
+        const W = which === 'work';
+        const S = which === 'site';
+        if (panelUpload) panelUpload.style.display = U ? 'block' : 'none';
+        if (panelWork) panelWork.style.display = W ? 'block' : 'none';
+        if (panelSite) panelSite.style.display = S ? 'block' : 'none';
+        if (tabUpload) tabUpload.classList.toggle('active', U);
+        if (tabWork) tabWork.classList.toggle('active', W);
+        if (tabSite) tabSite.classList.toggle('active', S);
+        if (worksSection) worksSection.style.display = W ? 'block' : 'none';
+      }
+      tabUpload?.addEventListener('click', ()=> showPanel('upload'));
+      tabWork?.addEventListener('click', ()=> { showPanel('work'); loadWorks(); });
+      tabSite?.addEventListener('click', ()=> { showPanel('site'); loadSiteForm(); });
+
+      console.log('DOM elements:', {
+        loginForm: !!loginForm,
+        loginBtn: !!loginBtn,
+        passwordField: !!passwordField,
+        loginErr: !!loginErr
+      });
+
+      // Authentication check
+      async function checkAuth() {
+        try {
+          console.log('Checking authentication...');
+          await japi('/api/me');
+          console.log('Auth successful');
+          uploader.style.display = 'block';
+          logout.style.display = 'inline-block';
+          auth.style.display = 'none';
+          showPanel('upload');
+          loadWorks();
+          loadSiteForm();
+        } catch (e) {
+          console.log('Auth failed:', e.message);
+          uploader.style.display = 'none';
+          logout.style.display = 'none';
+          auth.style.display = 'block';
+          if (worksSection) worksSection.style.display = 'none';
+        }
+      }
+
+      // Login handler
+      async function loginHandler(e) {
+        try {
+          console.log('=== LOGIN HANDLER START ===');
+          if (e) {
+            e.preventDefault();
+            e.stopPropagation();
+          }
+
+          const password = passwordField.value;
+          console.log('Password length:', password ? password.length : 0);
+
+          loginErr.textContent = 'Attempting login...';
+          loginErr.style.color = 'orange';
+
+          if (!password) {
+            loginErr.textContent = 'Please enter password';
+            loginErr.style.color = 'red';
+            return;
+          }
+
+          console.log('Making login request...');
+          await japi('/api/login', {
+            method: 'POST',
+            body: JSON.stringify({ password })
+          });
+
+          loginErr.textContent = 'Login successful!';
+          loginErr.style.color = 'green';
+
+          console.log('Calling checkAuth...');
+          await checkAuth();
+
+        } catch (err) {
+          console.error('Login error:', err);
+          loginErr.textContent = 'Error: ' + (err.message || 'Login failed');
+          loginErr.style.color = 'red';
+        }
+      }
+
+      // Load works
+      async function loadWorks() {
+        try {
+          const works = await japi('/api/works');
+          const list = document.getElementById('works');
+          list.innerHTML = '';
+          const selected = new Set();
+          works.forEach(work => {
+            const li = document.createElement('li');
+            const status = (typeof work.published === 'boolean' ? (work.published ? 'Public' : 'Private') : 'Public');
+            li.innerHTML = `
+              <span class="col-check"><input type="checkbox" data-slug="${work.slug}"/></span>
+              <span class="col-title">${work.title || 'Untitled'} <small style="color:#aaa">(${work.slug}) — ${status}</small></span>
+              <div class="col-actions">
+                <button class='btn' onclick='editWork("${work.slug}")' style="margin-right: 8px;">Edit</button>
+                <button class='btn' data-toggle-pub="${work.slug}" style="margin-right: 8px;">${(work.published===false)?'Publish':'Unpublish'}</button>
+                <button class='btn' onclick='deleteWork("${work.slug}")'>Delete</button>
+              </div>
+            `;
+            list.appendChild(li);
+          });
+          // selection
+          list.querySelectorAll('input[type="checkbox"][data-slug]').forEach(cb => {
+            cb.addEventListener('change', ()=>{
+              const s = cb.getAttribute('data-slug');
+              if (cb.checked) selected.add(s); else selected.delete(s);
+            });
+          });
+          // bind publish toggle buttons
+          const notifyTop = () => { try { if ('BroadcastChannel' in window) { const bc=new BroadcastChannel('troy-sync'); bc.postMessage('works-updated'); setTimeout(()=>bc.close(), 200); } } catch {} };
+
+          list.querySelectorAll('button[data-toggle-pub]').forEach(btn => {
+            btn.addEventListener('click', async () => {
+              const slug = btn.getAttribute('data-toggle-pub');
+              try {
+                const works = await japi('/api/works');
+                const w = works.find(x => x.slug === slug);
+                if (!w) return;
+                await japi('/api/works', { method:'POST', body: JSON.stringify({ slug, title: w.title || slug, published: !(w.published===true) }) });
+                loadWorks();
+                notifyTop();
+              } catch (e) { alert('Toggle failed: ' + e.message); }
+            });
+          });
+          // bulk buttons
+          const bulkPub = document.getElementById('bulk-publish');
+          const bulkUnpub = document.getElementById('bulk-unpublish');
+          const bulkSchedule = document.getElementById('bulk-schedule');
+          const bulkAt = document.getElementById('bulk-schedule-at');
+          const getSel = () => Array.from(selected);
+          if (bulkPub) bulkPub.onclick = async ()=>{ const slugs=getSel(); if (slugs.length===0) return alert('Select items.'); await japi('/api/works/bulk',{method:'POST',body:JSON.stringify({ slugs, published:true })}); loadWorks(); notifyTop(); };
+          if (bulkUnpub) bulkUnpub.onclick = async ()=>{ const slugs=getSel(); if (slugs.length===0) return alert('Select items.'); await japi('/api/works/bulk',{method:'POST',body:JSON.stringify({ slugs, published:false })}); loadWorks(); notifyTop(); };
+          if (bulkSchedule) bulkSchedule.onclick = async ()=>{ const slugs=getSel(); if (slugs.length===0) return alert('Select items.'); const v=bulkAt?.value; if(!v) return alert('Pick date/time'); await japi('/api/works/bulk',{method:'POST',body:JSON.stringify({ slugs, scheduledAt:new Date(v).toISOString() })}); loadWorks(); notifyTop(); };
+          const importBtn = document.getElementById('import-movies');
+          if (importBtn) importBtn.onclick = async ()=>{
+            const publishNow = confirm('Import all videos from movies/ ? OK=Publish now, Cancel=Import as private');
+            if (!confirm('This will rebuild list (replace). Continue?')) return;
+            await japi('/api/import-movies', { method:'POST', body: JSON.stringify({ mode:'replace', defaultPublished: publishNow }) });
+            alert('Imported from movies');
+            loadWorks(); notifyTop();
+          };
+        } catch (e) {
+          console.error('Failed to load works:', e);
+        }
+      }
+
+      // Edit work
+      async function editWork(slug) {
+        try {
+          showPanel('work');
+          const works = await japi('/api/works');
+          const work = works.find(w => w.slug === slug);
+          if (!work) {
+            alert('Work not found');
+            return;
+          }
+          
+          // Fill form with work data
+          document.getElementById('slug').value = work.slug || '';
+          document.getElementById('title').value = work.title || '';
+          document.getElementById('meta').value = work.meta || '';
+          document.getElementById('cats').value = work.cats || '';
+          document.getElementById('kind').value = work.kind || '';
+          document.getElementById('videoSrc').value = work.videoSrc || '';
+          document.getElementById('poster').value = work.poster || '';
+          document.getElementById('imageSrc').value = work.imageSrc || '';
+          document.getElementById('link').value = work.link || '';
+          document.getElementById('desc').value = work.desc || '';
+          document.getElementById('date').value = work.date || '';
+          document.getElementById('role').value = work.role || '';
+          document.getElementById('clientName').value = work.clientName || '';
+          document.getElementById('published').value = (typeof work.published === 'boolean' ? String(work.published) : 'true');
+          const sch = (typeof work.scheduledAt === 'number') ? new Date(work.scheduledAt) : (work.scheduledAt ? new Date(work.scheduledAt) : null);
+          document.getElementById('scheduledAt').value = sch ? (new Date(sch.getTime() - sch.getTimezoneOffset()*60000).toISOString().slice(0,16)) : '';
+          const ph = document.getElementById('pinHero'); if (ph) ph.value = (work.pinHero ? 'true' : 'false');
+          
+          // Handle project type
+          const projectTypeSelect = document.getElementById('projectType');
+          const customProjectTypeInput = document.getElementById('customProjectType');
+          
+          if (work.projectType) {
+            // Check if project type exists in options
+            const option = Array.from(projectTypeSelect.options).find(opt => opt.value === work.projectType);
+            if (option) {
+              projectTypeSelect.value = work.projectType;
+              customProjectTypeInput.style.display = 'none';
+            } else {
+              // Custom project type
+              projectTypeSelect.value = 'custom';
+              customProjectTypeInput.value = work.projectType;
+              customProjectTypeInput.style.display = 'block';
+            }
+          } else {
+            projectTypeSelect.value = '';
+            customProjectTypeInput.style.display = 'none';
+          }
+          
+          // Show edit mode indicator
+          document.getElementById('edit-mode-indicator').style.display = 'inline';
+          document.getElementById('save-work-btn').textContent = 'Update Work';
+          
+          // Scroll to form
+          document.getElementById('work-form').scrollIntoView({ behavior: 'smooth' });
+          
+        } catch (e) {
+          alert('Failed to load work: ' + e.message);
+        }
+      }
+
+      // Clear form function
+      function clearForm() {
+        document.getElementById('work-form').reset();
+        document.getElementById('customProjectType').style.display = 'none';
+        document.getElementById('edit-mode-indicator').style.display = 'none';
+        document.getElementById('save-work-btn').textContent = 'Save Work';
+        const pubSel = document.getElementById('published');
+        if (pubSel) pubSel.value = 'false';
+        const sch = document.getElementById('scheduledAt');
+        if (sch) sch.value = '';
+        const ph2 = document.getElementById('pinHero'); if (ph2) ph2.value = 'false';
+      }
+
+      // Delete work
+      async function deleteWork(slug) {
+        if (!confirm('Delete this work?')) return;
+        try {
+          await japi(`/api/works/${encodeURIComponent(slug)}`, { method: 'DELETE' });
+          loadWorks();
+        } catch (e) {
+          alert('Delete failed: ' + e.message);
+        }
+      }
+
+      // Event listeners
+      if (loginBtn) {
+        loginBtn.addEventListener('click', loginHandler);
+        console.log('Login button listener added');
+      }
+
+      if (loginForm) {
+        loginForm.addEventListener('submit', loginHandler);
+        console.log('Login form listener added');
+      }
+
+      if (logout) {
+        logout.addEventListener('click', async () => {
+          try {
+            await japi('/api/logout', { method: 'POST' });
+            checkAuth();
+          } catch (e) {
+            console.error('Logout error:', e);
+          }
+        });
+      }
+
+      // Save work handler
+      const workForm = document.getElementById('work-form');
+      if (workForm) {
+        workForm.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const get = (id) => document.getElementById(id)?.value?.trim() || '';
+          
+          // Handle project type
+          let projectType = get('projectType');
+          if (projectType === 'custom') {
+            projectType = get('customProjectType');
+          }
+          
+          const workData = {
+            slug: get('slug'),
+            title: get('title'),
+            meta: get('meta'),
+            cats: get('cats'),
+            kind: get('kind'),
+            videoSrc: get('videoSrc'),
+            poster: get('poster'),
+            imageSrc: get('imageSrc'),
+            link: get('link'),
+            desc: get('desc'),
+            projectType: projectType,
+            date: get('date'),
+            role: get('role'),
+            clientName: get('clientName'),
+            published: (document.getElementById('published')?.value === 'true'),
+            scheduledAt: (function(){ const v=document.getElementById('scheduledAt')?.value; return v? new Date(v).toISOString():''; })(),
+            pinHero: (document.getElementById('pinHero')?.value === 'true')
+          };
+          
+          try {
+            await japi('/api/works', {
+              method: 'POST',
+              body: JSON.stringify(workData)
+            });
+            alert('Work saved successfully!');
+            loadWorks(); // Refresh the works list
+            clearForm(); // Clear form and reset edit mode
+            // notify top page to refresh
+            try { if ('BroadcastChannel' in window) { const bc=new BroadcastChannel('troy-sync'); bc.postMessage('works-updated'); setTimeout(()=>bc.close(), 200); } } catch {}
+          } catch (err) {
+            alert('Save failed: ' + err.message);
+          }
+        });
+      }
+
+      // Site form load/save
+      async function loadSiteForm() {
+        try {
+          const site = await japi('/api/site');
+          const p = site.profile || {}; const i = site.info || {};
+          const set = (id, v) => { const el=document.getElementById(id); if (el) el.value = v || ''; };
+          set('site-profile-title', p.title);
+          set('site-profile-tag', p.tag);
+          set('site-profile-intro', p.intro);
+          set('site-profile-detail', p.detail);
+          set('site-profile-credits', Array.isArray(p.credits)? p.credits.join('\n') : '');
+          set('site-info-email', i.email);
+          set('site-info-insta-url', i.instagramUrl);
+          set('site-info-insta-handle', i.instagramHandle);
+          set('site-info-availability', Array.isArray(i.availability)? i.availability.join('\n') : '');
+          set('site-info-press', Array.isArray(i.press)? i.press.join('\n') : '');
+        } catch {}
+      }
+
+      const siteForm = document.getElementById('site-form');
+      if (siteForm) {
+        siteForm.addEventListener('submit', async (e)=>{
+          e.preventDefault();
+          const get = (id)=> document.getElementById(id)?.value || '';
+          const site = {
+            profile: {
+              title: get('site-profile-title'),
+              tag: get('site-profile-tag'),
+              intro: get('site-profile-intro'),
+              detail: get('site-profile-detail'),
+              credits: get('site-profile-credits').split(/\n+/).filter(Boolean)
+            },
+            info: {
+              email: get('site-info-email'),
+              instagramUrl: get('site-info-insta-url'),
+              instagramHandle: get('site-info-insta-handle'),
+              availability: get('site-info-availability').split(/\n+/).filter(Boolean),
+              press: get('site-info-press').split(/\n+/).filter(Boolean)
+            }
+          };
+          try {
+            await japi('/api/site', { method: 'POST', body: JSON.stringify(site) });
+            alert('Site content saved.');
+          } catch (err) {
+            alert('Save failed: ' + err.message);
+          }
+        });
+      }
+
+      // Project Type selector handler
+      const projectTypeSelect = document.getElementById('projectType');
+      const customProjectTypeInput = document.getElementById('customProjectType');
+      
+      if (projectTypeSelect && customProjectTypeInput) {
+        projectTypeSelect.addEventListener('change', function() {
+          if (this.value === 'custom') {
+            customProjectTypeInput.style.display = 'block';
+            customProjectTypeInput.focus();
+          } else {
+            customProjectTypeInput.style.display = 'none';
+            customProjectTypeInput.value = '';
+          }
+        });
+      }
+
+      // Upload handler
+      const uploadForm = document.getElementById('upload-form');
+      if (uploadForm) {
+        uploadForm.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const fileInput = document.getElementById('file');
+          const file = fileInput.files[0];
+          
+          if (!file) {
+            alert('Please select a file');
+            return;
+          }
+          
+          const formData = new FormData();
+          formData.append('file', file);
+          // no posterSec here; poster can be generated from Work tab
+
+          const progress = document.getElementById('upload-progress');
+          const status = document.getElementById('upload-status');
+          progress.style.display = 'block';
+          progress.value = 0;
+          status.textContent = 'Uploading... 0%';
+
+          try {
+            const data = await new Promise((resolve, reject) => {
+              const xhr = new XMLHttpRequest();
+              xhr.open('POST', '/api/upload');
+              xhr.withCredentials = true;
+              let timer;
+              xhr.upload.onprogress = (ev) => {
+                if (ev.lengthComputable) {
+                  const pct = Math.round((ev.loaded / ev.total) * 100);
+                  progress.value = pct; status.textContent = `Uploading... ${pct}%`;
+                }
+              };
+              xhr.onreadystatechange = () => {
+                if (xhr.readyState === 2) {
+                  // upload finished; server is processing
+                  let dots = 0;
+                  timer = setInterval(() => { dots = (dots + 1) % 4; status.textContent = 'Processing on server' + '.'.repeat(dots); }, 500);
+                }
+              };
+              xhr.onerror = () => { clearInterval(timer); reject(new Error('Network error')); };
+              xhr.ontimeout = () => { clearInterval(timer); reject(new Error('Timeout')); };
+              xhr.onload = () => {
+                clearInterval(timer);
+                try { resolve(JSON.parse(xhr.responseText || '{}')); }
+                catch { reject(new Error('Invalid server response')); }
+              };
+              xhr.send(formData);
+            });
+
+            if (data.ok) {
+              document.getElementById('upload-result').textContent = data.url;
+
+              // Auto-fill form fields
+              const slugEl = document.getElementById('slug');
+              if (!slugEl.value) {
+                const basename = file.name.replace(/\.[^/.]+$/, "").replace(/[^a-z0-9]+/gi, '-').toLowerCase();
+                slugEl.value = basename;
+              }
+              // Kind + sources auto-set
+              const kindEl = document.getElementById('kind');
+              if (data.videoUrl || data.kind === 'video') {
+                // Video
+                kindEl.value = 'video';
+                document.getElementById('videoSrc').value = data.videoUrl || data.url;
+                if (data.posterUrl) document.getElementById('poster').value = data.posterUrl;
+              } else {
+                // Image or other
+                kindEl.value = 'image';
+                const imgEl = document.getElementById('imageSrc');
+                if (imgEl) imgEl.value = data.url;
+              }
+
+              // switch to work panel to review after upload
+              showPanel('work');
+
+              // Auto-save minimal work entry
+              try {
+                const workData = {
+                  slug: document.getElementById('slug').value.trim(),
+                  title: (document.getElementById('title').value.trim() || document.getElementById('slug').value.trim()),
+                  meta: (document.getElementById('meta').value.trim() || 'Dir. TROY'),
+                  cats: document.getElementById('cats').value,
+                  kind: document.getElementById('kind').value,
+                  videoSrc: document.getElementById('videoSrc').value.trim(),
+                  poster: document.getElementById('poster').value.trim(),
+                  imageSrc: document.getElementById('imageSrc').value.trim(),
+                  link: document.getElementById('link').value.trim(),
+                  desc: document.getElementById('desc').value.trim(),
+                  projectType: document.getElementById('projectType').value === 'custom' ? (document.getElementById('customProjectType').value.trim()) : document.getElementById('projectType').value,
+                  date: document.getElementById('date').value,
+                  role: document.getElementById('role').value.trim(),
+                  clientName: document.getElementById('clientName').value.trim(),
+                  published: false
+                };
+                if (workData.slug && workData.title) {
+                  await japi('/api/works', { method: 'POST', body: JSON.stringify(workData) });
+                  loadWorks();
+                  document.getElementById('edit-mode-indicator').style.display = 'none';
+                }
+              } catch (e) {
+                console.warn('Auto-save skipped:', e.message);
+              }
+            } else {
+              alert('Upload failed: ' + (data.error || 'Unknown error'));
+            }
+          } catch (err) {
+            alert('Upload error: ' + err.message);
+          } finally {
+            progress.style.display = 'none';
+          }
+        });
+      }
+
+      // Generate poster from Work tab
+      const genPosterBtn = document.getElementById('gen-poster');
+      if (genPosterBtn) {
+        genPosterBtn.addEventListener('click', async ()=>{
+          try {
+            const videoSrc = document.getElementById('videoSrc')?.value.trim();
+            const posterSec = parseFloat(document.getElementById('posterSec')?.value || '0') || 0;
+            if (!videoSrc) { alert('Set Video Src first'); return; }
+            const resp = await japi('/api/poster', { method:'POST', body: JSON.stringify({ videoSrc, posterSec }) });
+            if (resp && resp.posterUrl) { document.getElementById('poster').value = resp.posterUrl; }
+            alert('Poster generated.');
+          } catch (e) { alert('Poster failed: ' + e.message); }
+        });
+      }
+
+      // Clear form button
+      const clearFormBtn = document.getElementById('clear-form-btn');
+      if (clearFormBtn) {
+        clearFormBtn.addEventListener('click', clearForm);
+      }
+
+      // Initialize
+      console.log('=== INITIALIZING ===');
+      checkAuth();
+      console.log('=== ADMIN SCRIPT COMPLETE ===');
+    </script>
+  </body>
+ </html>

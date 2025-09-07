@@ -1,0 +1,323 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Admin — TROY</title>
+    <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="assets/style.css" />
+    <style>
+      body { max-width: 960px; margin: 0 auto; }
+      form { border: 1px solid var(--line); padding: 16px; margin: 16px 0; }
+      input, select, textarea { width: 100%; padding: 8px; margin: 6px 0 12px; background:#111; color:#fff; border:1px solid var(--line); }
+      .row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+      .works-list { margin-top: 16px; }
+      .works-list li { display:flex; justify-content: space-between; border-bottom:1px solid var(--line); padding:8px 0; }
+      .btn { padding:8px 12px; border:1px solid var(--line); background:#161616; color:#fff; cursor:pointer; }
+    </style>
+  </head>
+  <body>
+    <h1>Admin</h1>
+    
+    <!-- Debug Panel -->
+    <div id="debug-panel" style="background: #222; border: 1px solid #555; padding: 10px; margin: 10px 0; font-size: 12px;">
+      <strong>Debug Info:</strong>
+      <div id="debug-info">Loading...</div>
+      <button id="test-login-btn" style="margin-top: 5px; padding: 5px;">Test Login Function</button>
+    </div>
+    
+    <section id="auth">
+      <form id="login-form">
+        <input type="text" id="username" value="admin" autocomplete="username" style="position: absolute; left: -9999px; opacity: 0;" />
+        <label>Admin Password</label>
+        <input type="password" id="password" autocomplete="current-password" placeholder="your-secure-password" />
+        <button class="btn" type="button" id="login-btn">Login</button>
+        <p id="login-error" style="color: var(--accent); margin-top: 8px;"></p>
+      </form>
+      <button id="logout" class="btn" style="display:none;">Logout</button>
+    </section>
+
+    <section id="uploader" style="display:none;">
+      <h2>Upload File</h2>
+      <form id="upload-form">
+        <input type="file" id="file" />
+        <button class="btn" type="submit">Upload</button>
+        <p id="upload-result"></p>
+      </form>
+
+      <h2>New / Update Work</h2>
+      <form id="work-form">
+        <div class="row">
+          <div>
+            <label>Slug</label>
+            <input id="slug" placeholder="unique-slug" required />
+          </div>
+          <div>
+            <label>Category</label>
+            <select id="cats">
+              <option value="feature-films">Feature Films</option>
+              <option value="music-videos">Music Videos</option>
+              <option value="short-films">Short Films</option>
+              <option value="documentaries">Documentaries</option>
+              <option value="commercials">Commercials</option>
+            </select>
+          </div>
+        </div>
+        <label>Title</label>
+        <input id="title" />
+        <label>Meta</label>
+        <input id="meta" placeholder="Dir. TROY" />
+        <div class="row">
+          <div>
+            <label>Project Type</label>
+            <input id="projectType" placeholder="Music Video" />
+          </div>
+          <div>
+            <label>Date</label>
+            <input id="date" type="date" />
+          </div>
+        </div>
+        <label>Role</label>
+        <input id="role" placeholder="Director" />
+        <label>Kind</label>
+        <select id="kind"><option value="video">video</option><option value="image">image</option></select>
+        <label>Video Src</label>
+        <input id="videoSrc" placeholder="assets/works/xxx.mp4" />
+        <label>Poster</label>
+        <input id="poster" placeholder="assets/works/xxx.jpg" />
+        <label>Image Src</label>
+        <input id="imageSrc" placeholder="assets/works/xxx.jpg" />
+        <label>External Link</label>
+        <input id="link" placeholder="https://..." />
+        <label>Description</label>
+        <textarea id="desc" rows="4"></textarea>
+        <button class="btn" type="submit">Save Work</button>
+      </form>
+    </section>
+
+    <section>
+      <h2>Works</h2>
+      <ul id="works" class="works-list"></ul>
+    </section>
+
+    <script>
+      // Admin panel functionality
+      document.addEventListener('DOMContentLoaded', function() {
+        const $=(s)=>document.querySelector(s);
+        function ensure(id, formId){ let el=document.getElementById(id); if(!el){ el=document.createElement('p'); el.id=id; el.style.color='var(--accent)'; (document.getElementById(formId)||document.body).appendChild(el);} return el; }
+        const loginErr=document.getElementById('login-error') || ensure('login-error','login-form');
+        const uploadErr=ensure('upload-error','upload-form');
+        const workErr=ensure('work-error','work-form');
+        // add tags input if missing
+        if(!document.getElementById('tags')){
+          const lab=document.createElement('label'); lab.textContent='Tags (comma-separated)';
+          const inp=document.createElement('input'); inp.id='tags';
+          const form=document.getElementById('work-form');
+          const meta=$('#meta'); form.insertBefore(lab, meta.nextSibling); form.insertBefore(inp, lab.nextSibling);
+          const sugg=document.createElement('div'); sugg.id='tag-suggestions'; sugg.style.cssText='display:flex;flex-wrap:wrap;gap:6px;margin:6px 0;'; form.insertBefore(sugg, inp.nextSibling);
+        }
+        async function japi(path, opts={}){ const res=await fetch(path,{credentials:'include', headers:{'Content-Type':'application/json'}, ...opts}); const text=await res.text(); if(!res.ok){ try{const j=JSON.parse(text); throw new Error(j.error||text);}catch{ throw new Error(text||('HTTP '+res.status)); } } try{ return JSON.parse(text);}catch{return{};} }
+        
+        // Enhanced authentication check
+        async function checkAuth(){ 
+          try{ 
+            console.log('Checking authentication...');
+            const result = await japi('/api/me'); 
+            console.log('Auth check result:', result);
+            document.getElementById('uploader').style.display='block'; 
+            document.getElementById('logout').style.display='inline-block';
+            document.getElementById('auth').style.display='none';
+            await loadWorks(); 
+            console.log('Successfully authenticated and logged in');
+          }catch(e){ 
+            console.log('Auth check failed:', e.message);
+            document.getElementById('uploader').style.display='none'; 
+            document.getElementById('logout').style.display='none'; 
+            document.getElementById('auth').style.display='block';
+          } 
+        }
+        
+        // Load works list
+        async function loadWorks(){ 
+          const list=document.getElementById('works'); 
+          list.innerHTML=''; 
+          let items=[]; 
+          try{ items=await japi('/api/works'); }catch{ return; } 
+          items.forEach(w=>{ 
+            const li=document.createElement('li'); 
+            const title = (w.title || 'Untitled').replace(/[<>&"]/g, (c) => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c])); 
+            const slug = (w.slug || '').replace(/[<>&"]/g, (c) => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c])); 
+            li.innerHTML=`<span>${title} <small style="color:#aaa">(${slug})</small></span> <button class='btn' data-slug='${w.slug}'>Delete</button>`; 
+            list.appendChild(li); 
+          }); 
+          // Add delete handlers with auth check
+          list.querySelectorAll('button[data-slug]').forEach(btn=>btn.addEventListener('click', async()=>{ 
+            if(!confirm('Delete this work?')) return; 
+            try{ 
+              await japi('/api/works/'+encodeURIComponent(btn.dataset.slug),{method:'DELETE'}); 
+              await loadWorks(); 
+            }catch(e){ alert('Delete failed: ' + e.message); } 
+          })); 
+        }
+        // Global error handler
+        window.addEventListener('error', (e) => {
+          console.error('JavaScript Error:', e.error);
+          alert('JavaScript Error: ' + (e.error?.message || 'Unknown error'));
+        });
+        
+        window.addEventListener('unhandledrejection', (e) => {
+          console.error('Unhandled Promise Rejection:', e.reason);
+          alert('Promise Error: ' + (e.reason?.message || 'Unknown promise error'));
+        });
+        
+        // override login
+        const loginHandler = async (e) => {
+          try {
+            console.log('=== LOGIN HANDLER START ===');
+            console.log('Event:', e);
+            console.log('Event type:', e ? e.type : 'no event');
+            
+            if (e) {
+              e.preventDefault(); 
+              e.stopPropagation();
+            }
+            
+            const passwordField = $('#password');
+            console.log('Password field:', passwordField);
+            const password = passwordField ? passwordField.value : '';
+            console.log('Password length:', password ? password.length : 0);
+            
+            loginErr.textContent = 'Attempting login...';
+            loginErr.style.color = 'orange';
+            
+            if (!password) {
+              loginErr.textContent='Please enter password';
+              loginErr.style.color = 'red';
+              return;
+            }
+            
+            console.log('Making login request...');
+            const result = await japi('/api/login',{method:'POST', body:JSON.stringify({password})}); 
+            console.log('Login result:', result);
+            
+            loginErr.textContent = 'Login successful! Checking auth...';
+            loginErr.style.color = 'green';
+            
+            console.log('Calling checkAuth...');
+            await checkAuth(); 
+            
+            console.log('=== LOGIN HANDLER END ===');
+          } catch(err) { 
+            console.error('Login error:', err);
+            loginErr.textContent = 'Error: ' + (err.message || 'Login failed');
+            loginErr.style.color = 'red';
+            alert('Login Error: ' + (err.message || 'Login failed'));
+          } 
+        };
+        // Debug DOM elements
+        console.log('=== DOM SETUP DEBUG ===');
+        const lf = document.getElementById('login-form'); 
+        const loginBtn = document.getElementById('login-btn');
+        const passwordField = document.getElementById('password');
+        const errorDiv = document.getElementById('login-error');
+        
+        console.log('Form element:', lf);
+        console.log('Button element:', loginBtn);
+        console.log('Password field:', passwordField);
+        console.log('Error div:', errorDiv);
+        console.log('loginErr variable:', loginErr);
+        
+        // Test button click manually
+        if (loginBtn) {
+          console.log('Button found, adding listeners...');
+          
+          // Test immediate click
+          loginBtn.onclick = function(e) {
+            console.log('Button clicked via onclick');
+            loginHandler(e);
+          };
+          
+          loginBtn.addEventListener('click', function(e) {
+            console.log('Button clicked via addEventListener');
+            loginHandler(e);
+          });
+          
+          // Test button is clickable
+          loginBtn.style.pointerEvents = 'auto';
+          loginBtn.style.cursor = 'pointer';
+          
+          console.log('Button setup complete');
+        } else {
+          console.error('Login button not found!');
+          alert('ERROR: Login button not found in DOM');
+        }
+        
+        if (lf) {
+          console.log('Form found, adding submit listener...');
+          lf.addEventListener('submit', function(e) {
+            console.log('Form submitted');
+            loginHandler(e);
+          });
+        } else {
+          console.error('Login form not found!');
+          alert('ERROR: Login form not found in DOM');
+        }
+        
+        // Add direct test function
+        window.testLogin = function() {
+          console.log('Testing login directly...');
+          loginHandler();
+        };
+        
+        // Set up test button
+        const testBtn = document.getElementById('test-login-btn');
+        if (testBtn) {
+          testBtn.addEventListener('click', function() {
+            console.log('Test button clicked');
+            window.testLogin();
+          });
+        }
+        
+        console.log('=== DOM SETUP COMPLETE ===');
+        
+        // Update debug panel
+        const updateDebugInfo = () => {
+          const debugInfo = document.getElementById('debug-info');
+          if (debugInfo) {
+            debugInfo.innerHTML = `
+              Form: ${lf ? '✓' : '✗'}<br>
+              Button: ${loginBtn ? '✓' : '✗'}<br>
+              Password field: ${passwordField ? '✓' : '✗'}<br>
+              Error div: ${errorDiv ? '✓' : '✗'}<br>
+              LoginErr var: ${loginErr ? '✓' : '✗'}<br>
+              Button onclick: ${loginBtn && loginBtn.onclick ? '✓' : '✗'}<br>
+              Page loaded: ${document.readyState}
+            `;
+          }
+        };
+        
+        updateDebugInfo();
+        
+        // Update debug info every second for the first 10 seconds
+        let debugCounter = 0;
+        const debugInterval = setInterval(() => {
+          updateDebugInfo();
+          debugCounter++;
+          if (debugCounter >= 10) clearInterval(debugInterval);
+        }, 1000);
+        
+        // logout handler
+        document.getElementById('logout').addEventListener('click', async ()=>{ try{ await japi('/api/logout',{method:'POST'}); await checkAuth(); }catch(e){ console.error(e); } });
+        // override upload
+        const up=document.getElementById('upload-form'); up.addEventListener('submit', async (e)=>{ e.preventDefault(); const f=document.getElementById('file').files[0]; if(!f){ uploadErr.textContent='ファイルを選択してください'; return; } const fd=new FormData(); fd.append('file', f); try{ const res=await fetch('/api/upload',{method:'POST', body:fd, credentials:'include'}); const text=await res.text(); try{ const j=JSON.parse(text); if(j.ok){ document.getElementById('upload-result').textContent=j.url; uploadErr.textContent=''; // Auto-fill video src and poster if(!document.getElementById('slug').value){ const basename=f.name.replace(/\.[^/.]+$/, "").replace(/[^a-z0-9]+/gi, '-').toLowerCase(); document.getElementById('slug').value=basename; } if(j.videoUrl){ document.getElementById('videoSrc').value=j.videoUrl; } if(j.posterUrl){ document.getElementById('poster').value=j.posterUrl; } } else { uploadErr.textContent=j.error||'Upload failed'; } }catch{ uploadErr.textContent=text||'Upload failed'; } }catch(err){ uploadErr.textContent=err.message||'Upload failed'; } });
+        // override work save
+        const wf=document.getElementById('work-form'); wf.addEventListener('submit', async (e)=>{ e.preventDefault(); const get=(id)=>document.getElementById(id)?.value?.trim()||''; const body={ slug:get('slug'), title:get('title'), meta:get('meta'), cats:get('cats'), tags:get('tags'), kind:get('kind'), videoSrc:get('videoSrc'), poster:get('poster'), imageSrc:get('imageSrc'), link:get('link'), desc:get('desc'), projectType:get('projectType'), date:get('date'), role:get('role') }; try{ await japi('/api/works',{method:'POST', body:JSON.stringify(body)}); workErr.textContent=''; alert('Saved'); }catch(err){ workErr.textContent=err.message||'Save failed'; } });
+        // tag suggestions
+        (async()=>{ try{ const items=await japi('/api/works'); const set=new Set(); items.forEach(w=>{ (w.tags||'').split(',').map(s=>s.trim()).filter(Boolean).forEach(t=>set.add(t)); }); const wrap=document.getElementById('tag-suggestions'); if(wrap){ Array.from(set).slice(0,40).forEach(t=>{ const b=document.createElement('button'); b.type='button'; b.textContent=t; b.className='btn'; b.style.padding='4px 8px'; b.onclick=()=>{ const inp=document.getElementById('tags'); const cur=inp.value?inp.value.split(',').map(s=>s.trim()).filter(Boolean):[]; if(!cur.includes(t)) cur.push(t); inp.value=cur.join(', '); }; wrap.appendChild(b); }); } }catch{} })();
+        
+        // Initialize authentication on page load
+        checkAuth();
+      });
+    </script>
+  </body>
+  </html>

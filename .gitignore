@@ -1,0 +1,16 @@
+# Node
+node_modules/
+.npm-cache/
+
+# Runtime outputs / uploads
+movies/
+server.out
+
+# Data generated/edited via Admin
+data/works.json
+data/site.json
+
+# Env / OS
+.env
+.DS_Store
+
