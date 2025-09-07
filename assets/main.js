@@ -29,8 +29,6 @@
   );
   let pendingCategory = null; // for deep-linked category
   let applyFilter; // will be defined later
-  let currentSort = 'latest';
-  let searchQuery = '';
 
   const parseHash = () => {
     const h = (location.hash || '').replace('#', '');
@@ -462,6 +460,7 @@
         
         let mediaHtml;
         if (videoSrc && w.kind !== 'image') {
+          // Always show video, play on hover
           mediaHtml = `
             <video 
               src="${videoSrc}" 
@@ -470,15 +469,13 @@
               loop 
               playsinline
               preload="metadata"
-              onmouseover="this.play()" 
-              onmouseout="this.pause(); this.currentTime=0;"
-              onerror="this.style.display='none'; this.nextElementSibling.style.display='block';"
+              class="related-video"
+              style="width: 100%; aspect-ratio: 16/9; object-fit: cover; border-radius: 4px; display: block;"
             ></video>
-            <img src="${posterSrc || fallbackSrc}" alt="${w.title || ''}" loading="lazy" style="display: none;" onerror="this.src='${fallbackSrc}'; this.onerror=null;" />
           `;
         } else {
           const imageSrc = makeAbs(w.imageSrc || posterSrc || fallbackSrc);
-          mediaHtml = `<img src="${imageSrc}" alt="${w.title || ''}" loading="lazy" onerror="this.src='${fallbackSrc}'; this.onerror=null;" />`;
+          mediaHtml = `<img src="${imageSrc}" alt="${w.title || ''}" loading="lazy" style="width: 100%; aspect-ratio: 16/9; object-fit: cover; border-radius: 4px; display: block;" onerror="this.src='${fallbackSrc}'; this.onerror=null;" />`;
         }
         
         el.innerHTML = `
@@ -486,10 +483,35 @@
           <div class="related-item-title">${w.title || ''}</div>
           <div class="related-item-meta">${w.cats || ''}</div>
         `;
+        
+        relatedGrid.appendChild(el);
+        
+        // Add hover effects for video thumbnails after DOM insertion
+        const video = el.querySelector('.related-video');
+        if (video) {
+          // Set initial thumbnail frame when metadata loads
+          video.addEventListener('loadedmetadata', function() {
+            if (this.duration > 1) {
+              this.currentTime = 0.5;
+            }
+          });
+          
+          el.addEventListener('mouseenter', () => {
+            video.play().catch(() => {}); // Ignore autoplay errors
+          });
+          
+          el.addEventListener('mouseleave', () => {
+            video.pause();
+            // Set to 0.5 seconds to avoid black frame at start
+            if (video.duration > 1) {
+              video.currentTime = 0.5;
+            }
+          });
+        }
+        
         el.addEventListener('click', () => {
           if (w.slug) location.hash = `#project/${w.slug}`;
         });
-        relatedGrid.appendChild(el);
       });
       relatedSection.style.display = 'block';
     } catch (e) {
@@ -542,7 +564,7 @@
         const video = $('.work-video', target);
         if (!video) return;
         if (isIntersecting) {
-          loadVideoSrc(video);
+          // Video src is now set by default
         } else {
           // Pause when leaving viewport
           try { video.pause(); } catch {}
@@ -557,16 +579,74 @@
     if (!video) return;
     vio.observe(w);
 
-    const play = () => { loadVideoSrc(video); video.muted = true; video.play().catch(() => {}); };
-    const stop = () => { try { video.pause(); video.currentTime = 0; } catch {} };
+    const play = () => { video.muted = true; video.play().catch(() => {}); };
+    const stop = () => { try { video.pause(); if (video.duration > 1) video.currentTime = 0.5; } catch {} };
 
     w.addEventListener('mouseenter', play);
     w.addEventListener('mouseleave', stop);
     // Touch fallback: short play on tap-hold would conflict with click-open; keep click for modal only
   });
 
-  // Preload first few videos to ensure quick hover playback
-  videoWorks.slice(0, 4).forEach((w) => { const v = $('.work-video', w); if (v) loadVideoSrc(v); });
+  // Set src and poster attributes for static video elements
+  videoWorks.forEach((w) => {
+    const v = $('.work-video', w);
+    if (v) {
+      // Set src if not already set
+      if (!v.src && v.getAttribute('data-src')) {
+        v.src = v.getAttribute('data-src');
+      }
+      
+      // Ensure preload is set to metadata to show first frame
+      if (!v.getAttribute('preload')) {
+        v.setAttribute('preload', 'metadata');
+      }
+      
+      // Set poster from data attribute or try to find matching poster
+      const dataPoster = w.getAttribute('data-poster');
+      if (dataPoster && !v.getAttribute('poster')) {
+        v.setAttribute('poster', dataPoster);
+      } else if (!v.getAttribute('poster')) {
+        // Try to find matching poster in assets/works/
+        const videoSrc = v.src || v.getAttribute('data-src') || '';
+        const baseName = videoSrc.split('/').pop()?.replace(/\.[^.]*$/, '');
+        if (baseName) {
+          // Try common poster paths
+          const posterPaths = [
+            `/assets/works/${baseName}.jpg`,
+            `/movies/${baseName}.jpg`
+          ];
+          
+          // Set the first available poster path
+          posterPaths.forEach(path => {
+            if (!v.getAttribute('poster')) {
+              v.setAttribute('poster', path);
+            }
+          });
+          
+          // If still no poster, set fallback
+          if (!v.getAttribute('poster')) {
+            v.setAttribute('poster', '/assets/placeholders/still-01.svg');
+          }
+        }
+      }
+      
+      // Add error handling for video loading
+      v.addEventListener('error', function() {
+        console.warn('Video failed to load:', this.src);
+        // Set fallback poster if video fails
+        if (!this.getAttribute('poster')) {
+          this.setAttribute('poster', '/assets/placeholders/still-01.svg');
+        }
+      });
+      
+      // Force better thumbnail by setting currentTime to 0.5s to avoid black frame
+      v.addEventListener('loadedmetadata', function() {
+        if (this.duration > 1) {
+          this.currentTime = 0.5;
+        }
+      });
+    }
+  });
 
   // Hero (random autoplay video from works)
   (function initHero() {
@@ -712,9 +792,7 @@
           const poster = makeAbs(w.poster || '');
           fig.setAttribute('data-video-src', vSrc || '');
           if (poster) fig.setAttribute('data-poster', poster);
-          fig.innerHTML = `<div class="media-frame"><video class="work-video" muted playsinline webkit-playsinline loop preload="metadata" ${poster?`poster="${poster}"`:''} data-src="${vSrc || ''}" aria-label="${w.title || ''}"></video><div class="overlay"><div class="ovl-title">${w.title || ''}</div><div class="ovl-meta">${w.meta || ''}</div></div></div>`;
-          const v = fig.querySelector('.work-video');
-          if (v && !v.src) v.src = v.getAttribute('data-src') || '';
+          fig.innerHTML = `<div class="media-frame"><video class="work-video" muted playsinline webkit-playsinline loop preload="metadata" ${poster?`poster="${poster}"`:''} src="${vSrc || ''}" aria-label="${w.title || ''}"></video><div class="overlay"><div class="ovl-title">${w.title || ''}</div><div class="ovl-meta">${w.meta || ''}</div></div></div>`;
         }
         grid.appendChild(fig);
       }
@@ -725,10 +803,9 @@
         w.addEventListener('keydown', (e) => { if (e.key==='Enter'||e.key===' ') { e.preventDefault(); if (slug) location.hash = `#project/${slug}`; else openProject(w); }});
       });
       const vws = $$('.work[data-kind="video"]');
-      vws.forEach((w) => { const v=$('.work-video', w); if (!v) return; vio.observe(w); w.addEventListener('mouseenter', ()=>{ v.muted=true; if(!v.src) v.src=v.getAttribute('data-src')||''; v.play().catch(()=>{}); }); w.addEventListener('mouseleave', ()=>{ try{v.pause(); v.currentTime=0;}catch{} }); });
-      // Reapply filter/sort/search
+      vws.forEach((w) => { const v=$('.work-video', w); if (!v) return; vio.observe(w); w.addEventListener('mouseenter', ()=>{ v.muted=true; v.play().catch(()=>{}); }); w.addEventListener('mouseleave', ()=>{ try{v.pause(); v.currentTime=0;}catch{} }); });
+      // Reapply filter
       applyFilter(pendingCategory || 'all');
-      applySortAndSearch();
       // Update HERO from loaded items
       if (typeof window.__setHeroFromWorks === 'function') {
         // prefer pinned, then latest by updatedAt/createdAt
@@ -760,14 +837,8 @@
       const cats = (item.getAttribute('data-cats') || '').split(/\s+/).filter(Boolean);
       const match = filter === 'all' || cats.includes(filter);
       const video = $('.work-video', item);
-      const txt = [item.getAttribute('data-title')||'', item.getAttribute('data-client-name')||'', item.getAttribute('data-project-type')||''].join(' ').toLowerCase();
-      const qok = !searchQuery || txt.includes(searchQuery);
       if (match) {
-        if (qok) {
-          item.style.display = '';
-        } else {
-          item.style.display = 'none';
-        }
+        item.style.display = '';
         item.classList.remove('is-hiding');
         item.classList.add('is-showing');
         item.style.transitionDelay = (idx % 8) * 12 + 'ms';
@@ -780,50 +851,18 @@
     });
   };
 
-  function applySortAndSearch() {
-    const grid = $('.works-grid'); if (!grid) return;
-    const nodes = $$('.works-grid .work');
-    const arr = nodes.map(n => ({
-      node: n,
-      title: (n.getAttribute('data-title')||'').toLowerCase(),
-      client: (n.getAttribute('data-client-name')||'').toLowerCase(),
-      type: (n.getAttribute('data-project-type')||'').toLowerCase(),
-      updated: parseInt(n.getAttribute('data-updated')||'0',10) || 0
-    }));
-    arr.sort((a,b)=>{
-      switch(currentSort){
-        case 'oldest': return a.updated - b.updated;
-        case 'title': return a.title.localeCompare(b.title);
-        case 'client': return a.client.localeCompare(b.client);
-        case 'type': return a.type.localeCompare(b.type);
-        case 'latest': default: return b.updated - a.updated;
-      }
-    });
-    arr.forEach(x => grid.appendChild(x.node));
-  }
 
   filterBtns.forEach((btn) => {
     btn.addEventListener('click', () => {
       const f = btn.getAttribute('data-filter');
       location.hash = `#works/${f}`;
       applyFilter(f); // Always call applyFilter directly
-      applySortAndSearch();
     });
     btn.addEventListener('keydown', (e) => {
       if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); btn.click(); }
     });
   });
 
-  // Search & sort bindings
-  const searchInput = $('#search-works');
-  const sortSelect = $('#sort-works');
-  if (searchInput) {
-    const onSearch = () => { searchQuery = searchInput.value.trim().toLowerCase(); applyFilter(currentFilter); applySortAndSearch(); };
-    searchInput.addEventListener('input', onSearch);
-  }
-  if (sortSelect) {
-    sortSelect.addEventListener('change', () => { currentSort = sortSelect.value || 'latest'; applySortAndSearch(); });
-  }
 
   // Apply pending category or default
   applyFilter(pendingCategory || 'all');
@@ -900,5 +939,76 @@
       });
       hero.addEventListener('mouseleave', ()=>{ overlay.style.transform = ''; });
     }
+  })();
+
+  // Loading screen management
+  (function initLoader() {
+    const loadingScreen = document.getElementById('loading-screen');
+    if (!loadingScreen) return;
+
+    let loadingComplete = false;
+    let minDisplayTime = 1500; // Minimum display time in ms
+    const startTime = Date.now();
+
+    function hideLoader() {
+      const elapsed = Date.now() - startTime;
+      const remainingTime = Math.max(0, minDisplayTime - elapsed);
+      
+      setTimeout(() => {
+        loadingScreen.classList.add('fade-out');
+        setTimeout(() => {
+          loadingScreen.remove();
+        }, 500); // Match CSS transition duration
+      }, remainingTime);
+    }
+
+    // Wait for page to fully load
+    function checkLoadingComplete() {
+      // Check if videos are ready to play (at least metadata loaded)
+      const videos = document.querySelectorAll('video[src]');
+      let videosReady = 0;
+      
+      if (videos.length === 0) {
+        loadingComplete = true;
+        hideLoader();
+        return;
+      }
+
+      videos.forEach(video => {
+        if (video.readyState >= 1) { // HAVE_METADATA
+          videosReady++;
+        } else {
+          video.addEventListener('loadedmetadata', () => {
+            videosReady++;
+            if (videosReady >= videos.length) {
+              loadingComplete = true;
+              hideLoader();
+            }
+          }, { once: true });
+        }
+      });
+
+      if (videosReady >= videos.length) {
+        loadingComplete = true;
+        hideLoader();
+      }
+    }
+
+    // Start checking after DOM is loaded and scripts executed
+    if (document.readyState === 'complete') {
+      setTimeout(checkLoadingComplete, 100);
+    } else {
+      window.addEventListener('load', () => {
+        setTimeout(checkLoadingComplete, 100);
+      });
+    }
+
+    // Fallback: hide loader after maximum time
+    setTimeout(() => {
+      if (!loadingComplete) {
+        loadingComplete = true;
+        hideLoader();
+      }
+    }, 8000);
   })();
 })();

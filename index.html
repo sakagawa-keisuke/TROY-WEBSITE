@@ -13,9 +13,23 @@
     <meta property="og:image" content="assets/og-image.png" />
     <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
     <link rel="manifest" href="manifest.webmanifest" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="assets/style.css" />
   </head>
   <body data-page="home">
+    <!-- Loading Screen -->
+    <div id="loading-screen" class="loading-screen">
+      <div class="loading-content">
+        <div class="loading-logo">TROY</div>
+        <div class="loading-spinner">
+          <div class="spinner-ring"></div>
+        </div>
+        <div class="loading-text">Loading...</div>
+      </div>
+    </div>
+
     <a class="skip" href="#works">Skip to content</a>
 
     <div data-header-placeholder></div>
@@ -82,17 +96,6 @@
             <button class="filter-btn" data-filter="short-films" aria-pressed="false">Short Films</button>
             <button class="filter-btn" data-filter="documentaries" aria-pressed="false">Documentaries</button>
             <button class="filter-btn" data-filter="commercials" aria-pressed="false">Commercials</button>
-          </div>
-          <div class="filters" aria-label="Search and sort" style="margin-top:8px; gap:12px;">
-            <input id="search-works" type="search" placeholder="Search (title / client / type)" style="flex:1; min-width:220px; padding:6px 8px; background:#111; color:#fff; border:1px solid var(--line);" />
-            <label for="sort-works" style="color:var(--muted);">Sort</label>
-            <select id="sort-works" style="padding:6px 8px; background:#111; color:#fff; border:1px solid var(--line);">
-              <option value="latest" selected>Latest</option>
-              <option value="oldest">Oldest</option>
-              <option value="title">Title (A→Z)</option>
-              <option value="client">Client (A→Z)</option>
-              <option value="type">Type (A→Z)</option>
-            </select>
           </div>
         </div>
 
