@@ -1357,6 +1357,18 @@
           const imgSrc = makeAbs(display?.imageSrc || w.imageSrc || '');
           fig.setAttribute('data-image', imgSrc || '');
           fig.innerHTML = `<div class="media-frame"><img class="work-image" src="${imgSrc || ''}" alt="${w.title || ''}"><div class="overlay"><div class="ovl-title">${w.title || ''}</div><div class="ovl-meta">${w.meta || ''}</div></div></div>`;
+        } else if (displayKind === 'youtube') {
+          const youtubeId = w.youtubeId || '';
+          const poster = makeAbs(w.poster || `https://img.youtube.com/vi/${youtubeId}/maxresdefault.jpg`);
+          fig.setAttribute('data-video', youtubeId);
+          if (poster) fig.setAttribute('data-poster', poster);
+          fig.innerHTML = `<div class="media-frame"><div class="video-thumbnail" style="background-image: url('${poster}'); background-size: cover; background-position: center; aspect-ratio: 16/9; position: relative;"><div class="play-overlay" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 80px; height: 80px; background: rgba(255,0,0,0.8); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 32px;">▶</div></div><div class="overlay"><div class="ovl-title">${w.title || ''}</div><div class="ovl-meta">${w.meta || ''}</div></div></div>`;
+        } else if (displayKind === 'vimeo') {
+          const vimeoId = w.vimeoId || '';
+          const poster = makeAbs(w.poster || '');
+          fig.setAttribute('data-video', vimeoId);
+          if (poster) fig.setAttribute('data-poster', poster);
+          fig.innerHTML = `<div class="media-frame"><div class="video-thumbnail" style="background-image: url('${poster}'); background-size: cover; background-position: center; aspect-ratio: 16/9; position: relative;"><div class="play-overlay" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 80px; height: 80px; background: rgba(26,183,234,0.8); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 32px;">▶</div></div><div class="overlay"><div class="ovl-title">${w.title || ''}</div><div class="ovl-meta">${w.meta || ''}</div></div></div>`;
         } else {
           const vSrc = makeAbs(display?.videoSrc || display?.src || w.videoSrc || '');
           const poster = makeAbs(display?.poster || w.poster || '');

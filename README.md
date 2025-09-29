@@ -17,6 +17,20 @@ Kuroki Ryota (TROY) — Portfolio
 
 **注意**: Vercelの制限により、ファイルアップロード機能は制限されます。本格運用では外部ストレージ（AWS S3等）の使用を推奨します。
 
+## VPS（推奨）での本格運用
+
+**🎯 2GB RAMプランで十分動作します！**
+
+- **メモリ使用量**: 250-350MB程度
+- **推奨プロバイダー**: さくらVPS、ConoHa VPS、DigitalOcean
+- **特徴**: 
+  - ファイルアップロード制限なし
+  - 管理画面が完全動作
+  - 動画処理・変換対応
+  - 独自ドメイン・SSL対応
+
+詳細な設定手順は `DEPLOY_VPS.md` をご覧ください。
+
 構成
 - `index.html` メインページ（Profile / Works / Information の3セクション）
 - `assets/style.css` スタイル
@@ -30,11 +44,25 @@ Kuroki Ryota (TROY) — Portfolio
 - プロフィール: `index.html` の `#profile` セクションのテキストを書き換えてください。
 - 連絡先: `Information` のメールを実アドレスへ差し替え。
 - Instagram: 既に `@troy_loss` へのリンクが設定済みです。
-- Works: `#works` の `.works-grid` に `figure.work` を追加してください。
-  - YouTube: `<figure class="work" data-kind="youtube" data-video="{ID}">…`
-  - Vimeo: `<figure class="work" data-kind="vimeo" data-video="{ID}">…`
-  - 画像: `<figure class="work" data-kind="image" data-image="path/to.jpg">…`
-  - タイトルは `<span class="work-title">`、メタ情報は `<span class="work-meta">` を編集。
+
+## 動画投稿方法（3種類対応）
+
+管理画面 (`/admin`) で以下の投稿方法から選択できます：
+
+### 1. 直接動画アップロード
+- MP4ファイルを直接サーバーにアップロード
+- 自動的にH.264エンコード・サムネイル生成
+- ホバー再生対応
+
+### 2. YouTube動画
+- YouTube動画IDを入力するだけ
+- サムネイルは自動取得（カスタム指定も可能）
+- クリックでYouTubeプレーヤーで再生
+
+### 3. Vimeo動画
+- Vimeo動画IDを入力するだけ
+- カスタムサムネイル対応
+- クリックでVimeoプレーヤーで再生
 
 動画サムネ（参考サイト風にホバー再生）
 - 推奨: mp4(H.264), 1080p か 720p, 6–12秒, 16:9, 無音（muted）、短尺ループ向けにトリミング

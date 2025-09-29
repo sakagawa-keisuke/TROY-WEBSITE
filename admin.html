@@ -439,11 +439,36 @@
           </div>
         </div>
         <label>Kind</label>
-        <select id="kind"><option value="video">video</option><option value="image">image</option></select>
-        <label>Video Src</label>
-        <input id="videoSrc" placeholder="/movies/xxx.mp4" />
-        <label>Poster</label>
-        <input id="poster" placeholder="/movies/xxx.jpg" />
+        <select id="kind">
+          <option value="video">Direct Video Upload</option>
+          <option value="youtube">YouTube Video</option>
+          <option value="vimeo">Vimeo Video</option>
+          <option value="image">Image</option>
+        </select>
+        
+        <!-- Direct Video Upload -->
+        <div id="direct-video-fields">
+          <label>Video Src</label>
+          <input id="videoSrc" placeholder="/movies/xxx.mp4" />
+          <label>Poster</label>
+          <input id="poster" placeholder="/movies/xxx.jpg" />
+        </div>
+        
+        <!-- YouTube Fields -->
+        <div id="youtube-fields" style="display: none;">
+          <label>YouTube Video ID</label>
+          <input id="youtubeId" placeholder="dQw4w9WgXcQ (from https://www.youtube.com/watch?v=dQw4w9WgXcQ)" />
+          <label>YouTube Thumbnail (optional)</label>
+          <input id="youtubeThumbnail" placeholder="Custom thumbnail URL or leave blank for auto" />
+        </div>
+        
+        <!-- Vimeo Fields -->
+        <div id="vimeo-fields" style="display: none;">
+          <label>Vimeo Video ID</label>
+          <input id="vimeoId" placeholder="123456789 (from https://vimeo.com/123456789)" />
+          <label>Vimeo Thumbnail (optional)</label>
+          <input id="vimeoThumbnail" placeholder="Custom thumbnail URL or leave blank for auto" />
+        </div>
         <div class="row">
           <div>
             <label>Poster start (sec)</label>
@@ -757,9 +782,27 @@
           document.getElementById('meta').value = work.meta || '';
           document.getElementById('cats').value = work.cats || '';
           document.getElementById('kind').value = work.kind || '';
-          document.getElementById('videoSrc').value = work.videoSrc || '';
-          document.getElementById('poster').value = work.poster || '';
-          document.getElementById('imageSrc').value = work.imageSrc || '';
+          
+          // Fill kind-specific fields
+          const kind = work.kind || 'video';
+          switch(kind) {
+            case 'video':
+              document.getElementById('videoSrc').value = work.videoSrc || '';
+              document.getElementById('poster').value = work.poster || '';
+              break;
+            case 'youtube':
+              if (document.getElementById('youtubeId')) document.getElementById('youtubeId').value = work.youtubeId || '';
+              if (document.getElementById('youtubeThumbnail')) document.getElementById('youtubeThumbnail').value = work.poster || '';
+              break;
+            case 'vimeo':
+              if (document.getElementById('vimeoId')) document.getElementById('vimeoId').value = work.vimeoId || '';
+              if (document.getElementById('vimeoThumbnail')) document.getElementById('vimeoThumbnail').value = work.poster || '';
+              break;
+            case 'image':
+              document.getElementById('imageSrc').value = work.imageSrc || '';
+              break;
+          }
+          
           const tsEl = document.getElementById('thumbSec'); if (tsEl) tsEl.value = (work.thumbSec != null ? work.thumbSec : 0.5);
           const mjEl = document.getElementById('mediaJson'); if (mjEl) { try { mjEl.value = Array.isArray(work.media)? JSON.stringify(work.media, null, 2) : ''; } catch { mjEl.value=''; } }
           document.getElementById('link').value = work.link || '';
@@ -771,6 +814,9 @@
           const sch = (typeof work.scheduledAt === 'number') ? new Date(work.scheduledAt) : (work.scheduledAt ? new Date(work.scheduledAt) : null);
           document.getElementById('scheduledAt').value = sch ? (new Date(sch.getTime() - sch.getTimezoneOffset()*60000).toISOString().slice(0,16)) : '';
           const ph = document.getElementById('pinHero'); if (ph) ph.value = (work.pinHero ? 'true' : 'false');
+          
+          // Update field visibility after filling form
+          toggleVideoFields();
           
           // Handle project type
           const projectTypeSelect = document.getElementById('projectType');
@@ -867,15 +913,14 @@
           let media = [];
           try { const txt = document.getElementById('mediaJson')?.value || ''; if (txt.trim()) { const p = JSON.parse(txt); if (Array.isArray(p)) media = p; } } catch {}
           const tsv = parseFloat(document.getElementById('thumbSec')?.value || '');
+          const kind = get('kind');
+          
           const workData = {
             slug: get('slug'),
             title: get('title'),
             meta: get('meta'),
             cats: get('cats'),
-            kind: get('kind'),
-            videoSrc: get('videoSrc'),
-            poster: get('poster'),
-            imageSrc: get('imageSrc'),
+            kind: kind,
             thumbSec: Number.isFinite(tsv) ? tsv : undefined,
             media: media,
             link: get('link'),
@@ -888,6 +933,25 @@
             scheduledAt: (function(){ const v=document.getElementById('scheduledAt')?.value; return v? new Date(v).toISOString():''; })(),
             pinHero: (document.getElementById('pinHero')?.value === 'true')
           };
+          
+          // Add kind-specific fields
+          switch(kind) {
+            case 'video':
+              workData.videoSrc = get('videoSrc');
+              workData.poster = get('poster');
+              break;
+            case 'youtube':
+              workData.youtubeId = get('youtubeId');
+              workData.poster = get('youtubeThumbnail') || `https://img.youtube.com/vi/${get('youtubeId')}/maxresdefault.jpg`;
+              break;
+            case 'vimeo':
+              workData.vimeoId = get('vimeoId');
+              workData.poster = get('vimeoThumbnail');
+              break;
+            case 'image':
+              workData.imageSrc = get('imageSrc');
+              break;
+          }
           
           try {
             await japi('/api/works', {
@@ -1193,9 +1257,45 @@
         });
       }
 
+      // Kind selector change handler
+      const kindSelect = document.getElementById('kind');
+      const directVideoFields = document.getElementById('direct-video-fields');
+      const youtubeFields = document.getElementById('youtube-fields');
+      const vimeoFields = document.getElementById('vimeo-fields');
+      
+      function toggleVideoFields() {
+        const kind = kindSelect.value;
+        
+        // Hide all video fields first
+        if (directVideoFields) directVideoFields.style.display = 'none';
+        if (youtubeFields) youtubeFields.style.display = 'none';
+        if (vimeoFields) vimeoFields.style.display = 'none';
+        
+        // Show relevant fields
+        switch(kind) {
+          case 'video':
+            if (directVideoFields) directVideoFields.style.display = 'block';
+            break;
+          case 'youtube':
+            if (youtubeFields) youtubeFields.style.display = 'block';
+            break;
+          case 'vimeo':
+            if (vimeoFields) vimeoFields.style.display = 'block';
+            break;
+          case 'image':
+            // Image fields are always visible
+            break;
+        }
+      }
+      
+      if (kindSelect) {
+        kindSelect.addEventListener('change', toggleVideoFields);
+      }
+
       // Initialize
       console.log('=== INITIALIZING ===');
       checkAuth();
+      toggleVideoFields(); // Set initial field visibility
       console.log('=== ADMIN SCRIPT COMPLETE ===');
     </script>
   </body>
