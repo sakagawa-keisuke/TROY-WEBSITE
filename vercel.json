@@ -4,10 +4,13 @@
     { "src": "api/*.js", "use": "@vercel/node" }
   ],
   "cleanUrls": true,
+  "trailingSlash": true,
   "rewrites": [
     { "source": "/api/:match*", "destination": "/api/:match*" },
-    { "source": "/admin", "destination": "/admin.html" },
     { "source": "/", "destination": "/top.html" }
+  ],
+  "redirects": [
+    { "source": "/admin", "destination": "/admin/index.html", "permanent": false }
   ],
   "headers": [
     {
