@@ -7,7 +7,8 @@
     "start": "node server/server.js",
     "dev": "nodemon server/server.js",
     "start:3000": "PORT=3000 node server/server.js",
-    "dev:3000": "PORT=3000 nodemon server/server.js"
+    "dev:3000": "PORT=3000 nodemon server/server.js",
+    "production": "NODE_ENV=production node server/server.js"
   },
   "dependencies": {
     "cookie-parser": "^1.4.6",
