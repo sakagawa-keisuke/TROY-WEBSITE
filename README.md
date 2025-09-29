@@ -2,6 +2,21 @@ Kuroki Ryota (TROY) — Portfolio
 
 ローカルで `index.html` をブラウザで開くだけで閲覧できます。静的サイトなのでホスティングも簡単です（GitHub Pages / Vercel / Netlify など）。
 
+## Vercelでの管理画面付きデプロイ
+
+管理画面を使用するには、Vercelで以下の環境変数を設定してください：
+
+1. Vercelダッシュボードで「Settings」→「Environment Variables」に移動
+2. 以下の変数を追加：
+   - `ADMIN_PASSWORD`: 管理画面のパスワード（例：`your-secure-password`）
+   - `ADMIN_JWT_SECRET`: JWT認証用のシークレット（例：`your-jwt-secret-key`）
+
+3. 管理画面へのアクセス：
+   - URL: `https://your-domain.vercel.app/admin`
+   - ログイン後、作品のアップロード・編集・公開管理が可能
+
+**注意**: Vercelの制限により、ファイルアップロード機能は制限されます。本格運用では外部ストレージ（AWS S3等）の使用を推奨します。
+
 構成
 - `index.html` メインページ（Profile / Works / Information の3セクション）
 - `assets/style.css` スタイル
