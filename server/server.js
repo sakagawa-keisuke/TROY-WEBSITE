@@ -455,6 +455,11 @@ app.post('/api/normalize', auth, async (req, res, next) => {
 });
 
 // Static
+// Root -> landing page
+app.get('/', (req,res) => {
+  try { res.sendFile(path.join(PUBLIC_DIR, 'top.html')); }
+  catch { res.status(404).send('Not found'); }
+});
 app.get(['/admin','/admin.html'], (req,res) => {
   try { res.sendFile(path.join(PUBLIC_DIR, 'admin.html')); }
   catch { res.status(404).send('Not found'); }

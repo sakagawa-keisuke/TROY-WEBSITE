@@ -19,14 +19,13 @@
     <link rel="stylesheet" href="assets/style.css" />
   </head>
   <body data-page="home">
+    <!-- Background video removed: use solid black background -->
     <!-- Loading Screen -->
     <div id="loading-screen" class="loading-screen">
       <div class="loading-content">
-        <div class="loading-logo">TROY</div>
-        <div class="loading-spinner">
-          <div class="spinner-ring"></div>
+        <div class="loading-video" aria-label="Loading">
+          <video src="movies/landing.mp4" autoplay muted playsinline loop></video>
         </div>
-        <div class="loading-text">Loading...</div>
       </div>
     </div>
 
@@ -36,7 +35,7 @@
 
     <main id="content" class="site-main" role="main">
       <!-- Profile (hidden by default; shown via nav) -->
-      <section id="profile" class="section section-profile" aria-labelledby="profile-title" hidden>
+      <section id="profile" class="section section-profile reveal" aria-labelledby="profile-title" hidden>
         <div class="section-header">
           <h1 id="profile-title">Kuroki Ryota <span class="aka">(TROY)</span></h1>
           <p class="tag">Film Director / 東京</p>
@@ -57,7 +56,7 @@
       </section>
 
       <!-- Information (hidden by default; shown via nav) -->
-      <section id="info" class="section section-info" aria-labelledby="info-title" hidden>
+      <section id="info" class="section section-info reveal" aria-labelledby="info-title" hidden>
         <div class="section-header">
           <h2 id="info-title">Information</h2>
         </div>
@@ -89,6 +88,7 @@
       <section id="works" class="section section-works" aria-labelledby="works-title">
         <div class="section-header">
           <h2 id="works-title">Works</h2>
+          <div id="works-intro" class="works-intro-blurb">A lens on the edge of culture.</div>
           <div class="filters" role="toolbar" aria-label="Filter categories">
             <button class="filter-btn active" data-filter="all" aria-pressed="true">All</button>
             <button class="filter-btn" data-filter="feature-films" aria-pressed="false">Feature Films</button>
@@ -115,10 +115,10 @@
         <div class="works-grid">
           <!-- Sample assets wired from サンプル素材 -->
 
-          <!-- 1) Benson Boone — has matching poster -->
-          <figure class="work" data-kind="video" data-slug="beautiful-things" data-title="Beautiful Things — Japanese MV" data-meta="Dir. TROY" data-cats="music-videos" data-video-src="サンプル素材/Direction for @bensonboone 「Beautiful Things」 Japanese Official Music VideoCast- Nanami - Nobuna.mp4" data-poster="サンプル素材/Direction for @bensonboone 「Beautiful Things」 Japanese Official Music VideoCast- Nanami - Nobuna.jpg" tabindex="0">
+          <!-- 1) Benson Boone — demo with multi-media gallery -->
+          <figure class="work" data-kind="video" data-slug="beautiful-things" data-title="Beautiful Things — Japanese MV" data-meta="Dir. TROY" data-cats="music-videos" data-video-src="movies/beautiful-things.mp4" data-poster="movies/beautiful-things.jpg" data-media='[{"kind":"video","videoSrc":"/movies/beautiful-things.mp4","poster":"/movies/beautiful-things.jpg"},{"kind":"video","videoSrc":"/movies/ai-narration.mp4"},{"kind":"video","videoSrc":"/movies/bed.mp4"}]' tabindex="0">
             <div class="media-frame">
-            <video class="work-video" muted playsinline loop preload="metadata" poster="movies/Direction for @bensonboone 「Beautiful Things」 Japanese Official Music VideoCast- Nanami - Nobuna.jpg" data-src="movies/Direction for @bensonboone 「Beautiful Things」 Japanese Official Music VideoCast- Nanami - Nobuna.mp4" aria-label="Direction for @bensonboone 「Beautiful Things」"></video>
+            <video class="work-video" muted playsinline loop preload="metadata" poster="movies/beautiful-things.jpg" data-src="movies/beautiful-things.mp4" aria-label="Direction for @bensonboone 「Beautiful Things」"></video>
               <div class="overlay">
                 <div class="ovl-title">Beautiful Things — Japanese MV</div>
                 <div class="ovl-meta">Dir. TROY</div>
@@ -206,7 +206,7 @@
           <!-- 9) AI 語り映像 -->
           <figure class="work" data-kind="video" data-slug="ai-narration" data-title="AI 語り映像" data-meta="Dir. TROY" data-cats="short-films" data-video-src="movies/撮って繋いだ映像をAIに読み込ませて状況を語らせた。間違った読み上げも所々あったが修正せずにそのまま使った。この映像は現時点でのAIの身体測定。これからどんどんAIは大.mp4" tabindex="0">
             <div class="media-frame">
-              <video class="work-video" muted playsinline loop preload="metadata" data-src="movies/撮って繋いだ映像をAIに読み込ませて状況を語らせた。間違った読み上げも所々あったが修正せずにそのまま使った。この映像は現時点でのAIの身体測定。これからどんどんAIは大.mp4" aria-label="AI 語り映像"></video>
+              <video class="work-video" muted playsinline loop preload="metadata" data-src="movies/ai-narration.mp4" aria-label="AI 語り映像"></video>
               <div class="overlay">
                 <div class="ovl-title">AI 語り映像</div>
                 <div class="ovl-meta">Dir. TROY</div>

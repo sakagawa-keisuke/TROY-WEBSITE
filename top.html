@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>TROY — Landing</title>
+    <meta name="theme-color" content="#0b0b0b" />
+    <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/style.css" />
+  </head>
+  <body data-page="landing">
+    <!-- Background video removed: use solid black background -->
+
+    <!-- Loading Screen (with logo movie) -->
+    <div id="loading-screen" class="loading-screen">
+      <div class="loading-content">
+        <div class="loading-video" aria-label="Loading">
+          <video src="movies/landing.mp4" autoplay muted playsinline loop></video>
+        </div>
+      </div>
+    </div>
+
+    <div class="landing-wrap" role="main">
+      <div class="landing-scrim" aria-hidden="true"></div>
+      <div class="landing-content">
+        <!-- Text elements removed as requested -->
+        <!-- Hidden CTA element for automatic navigation -->
+        <a id="landing-cta" class="landing-cta" href="index.html#works" aria-label="Enter portfolio" style="display: none;">ENTER</a>
+      </div>
+    </div>
+
+    <script type="module" src="assets/main.js"></script>
+  </body>
+  </html>
